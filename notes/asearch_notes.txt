@@ -1,0 +1,27 @@
+I'm looking at sf_read*. What are items? What are frames?
+
+An itemtt> is a single sample of the data type you are reading; ie a single short value for sf_read_short or a single float for sf_read_float.
+
+For a sound file with only one channel, a frame is the same as a item (ie a single sample) while for multi channel sound files, a single frame contains a single item for each channel.
+Here are two simple, correct examples, both of which are assumed to be working on a stereo file, first using items:
+
+        #define CHANNELS 2
+        short data [CHANNELS * 100] ;
+        sf_count items_read = sf_read_short (file, data, 200) ;
+        assert (items_read == 200) ;
+and now readng the exact same amount of data using frames:
+
+        #define CHANNELS 2
+        short data [CHANNELS * 100] ;
+        sf_count frames_read = sf_readf_short (file, data, 100) ;
+        assert (frames_read == 100) ;
+
+struct stereo_frame_t {
+    float item_left;
+    float item_right;
+};
+
+stereo_frame_t wav[] = {{L,R}, {L,R}, .... };
+
+
+-------------------------------------------------

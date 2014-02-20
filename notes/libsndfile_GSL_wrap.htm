@@ -1,0 +1,277 @@
+<html>
+<head>
+  <title>/home/pogrady/work/headers/libsndfile_GSL_wrap/libsndfile_GSL_wrap.h</title>
+</head>
+<body bgcolor="#ffffff" text="#000000">
+<pre>
+<font color="#444444">/*
+ *  Paul's GSL wrappers for the libsndfile sound library
+ *
+ *	Author: Paul O'Grady
+ *	www.hamilton.ie/paul
+ *
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+ *
+ */</font>
+
+<font color="0000ff"><strong>#include <font color="#008000">&lt;sndfile.h&gt;</font>	<font color="#444444">	/*Libsndfile*/</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;gsl/gsl_vector.h&gt;</font><font color="#444444">	/*GNU Scientific Library*/</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;gsl/gsl_matrix.h&gt;</font></strong></font>
+<font color="0000ff"><strong>#include <font color="#008000">&lt;gsl/gsl_math.h&gt;</font></strong></font>
+
+
+<strong>void</strong> <font color="#2040a0">soundFileInfo</font><font color="4444FF">(</font><font color="#2040a0">SF_INFO</font> <font color="4444FF">*</font>,<strong>char</strong><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<strong>void</strong> <font color="#2040a0">loadSoundFilesIntoMatrixRows</font><font color="4444FF">(</font><font color="#2040a0">gsl_matrix</font> <font color="4444FF">*</font>,<strong>char</strong><font color="4444FF">[</font><font color="4444FF">]</font>,<strong>char</strong> <font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<strong>void</strong> <font color="#2040a0">saveMatrixRowsAsSoundFiles</font><font color="4444FF">(</font><font color="#2040a0">gsl_matrix</font> <font color="4444FF">*</font>, <font color="#2040a0">SF_INFO</font>, <strong>char</strong><font color="4444FF">[</font><font color="4444FF">]</font>, <strong>char</strong><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<strong>void</strong> <font color="#2040a0">loadSoundFileIntoVector</font><font color="4444FF">(</font><font color="#2040a0">gsl_vector</font> <font color="4444FF">*</font>,<strong>char</strong><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<strong>void</strong> <font color="#2040a0">saveVectorAsSoundFile</font><font color="4444FF">(</font><font color="#2040a0">gsl_vector</font> <font color="4444FF">*</font>, <font color="#2040a0">SF_INFO</font>,<strong>char</strong><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+<strong>void</strong> <font color="#2040a0">loadStereoFileIntoMatrix</font><font color="4444FF">(</font><font color="#2040a0">gsl_matrix</font> <font color="4444FF">*</font>,<strong>char</strong><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+<font color="#444444">/* Determine format information from sound file */</font>
+<strong>void</strong> <font color="#2040a0">soundFileInfo</font><font color="4444FF">(</font><font color="#2040a0">SF_INFO</font> <font color="4444FF">*</font><font color="#2040a0">sfinfo</font>, <strong>char</strong> <font color="#2040a0">fileName</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <font color="#444444">/* libsndfile */</font>
+
+  <font color="#2040a0">SNDFILE</font> <font color="4444FF">*</font><font color="#2040a0">infile</font><font color="4444FF">;</font>
+  <font color="#2040a0">SF_INFO</font> <font color="#2040a0">sfinfoInternal</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* File name */</font>
+  //<strong>char</strong> <font color="#2040a0">soundFileName</font><font color="4444FF">[</font><font color="#FF0000">40</font><font color="4444FF">]</font><font color="4444FF">;</font>
+  <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">soundFileNamePointer</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* Create Mixture Name */</font>
+  //<font color="#2040a0">snprintf</font><font color="4444FF">(</font><font color="#2040a0">soundFileName</font>, <font color="#FF0000">40</font>, <font color="#008000">&quot;%s1.%s&quot;</font>,<font color="#2040a0">fileName</font>,<font color="#2040a0">fileExtension</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  //<font color="#2040a0">snprintf</font><font color="4444FF">(</font><font color="#2040a0">soundFileName</font>, <font color="#FF0000">40</font>, <font color="#008000">&quot;%s.%s&quot;</font>,<font color="#2040a0">fileName</font>,<font color="#2040a0">fileExtension</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  //<font color="#2040a0">soundFileNamePointer</font> <font color="4444FF">=</font> <font color="#2040a0">soundFileName</font><font color="4444FF">;</font>
+  <font color="#2040a0">soundFileNamePointer</font> <font color="4444FF">=</font> <font color="#2040a0">fileName</font><font color="4444FF">;</font>
+
+  <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">!</font> <font color="4444FF">(</font><font color="#2040a0">infile</font> <font color="4444FF">=</font> <font color="#2040a0">sf_open</font><font color="4444FF">(</font><font color="#2040a0">soundFileNamePointer</font>, <font color="#2040a0">SFM_READ</font>, <font color="4444FF">&amp;</font><font color="#2040a0">sfinfoInternal</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font>
+      <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;Error (soundFileInfo): could not open file : %s<font color="#77dd77">\n</font>&quot;</font>, <font color="#2040a0">soundFileNamePointer</font><font color="4444FF">)</font><font color="4444FF">;</font>
+      <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;error number = %d<font color="#77dd77">\n</font>&quot;</font>,<font color="#2040a0">sf_perror</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+      <font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+  <font color="4444FF">*</font><font color="#2040a0">sfinfo</font> <font color="4444FF">=</font> <font color="#2040a0">sfinfoInternal</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* Free up allocated memory */</font>
+  <font color="#2040a0">sf_close</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+<font color="4444FF"><strong>}</strong></font>
+
+
+<font color="#444444">/* Open mixture sound files and place data into the rows of the matrix */</font>
+<strong>void</strong> <font color="#2040a0">loadSoundFilesIntoMatrixRows</font><font color="4444FF">(</font><font color="#2040a0">gsl_matrix</font> <font color="4444FF">*</font> <font color="#2040a0">data</font>, <strong>char</strong> <font color="#2040a0">fileName</font><font color="4444FF">[</font><font color="4444FF">]</font>, <strong>char</strong> <font color="#2040a0">fileExtension</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <strong>int</strong> <font color="#2040a0">noOfSoundFiles</font> <font color="4444FF">=</font> <font color="#2040a0">data</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">size1</font><font color="4444FF">;</font>
+  <strong>int</strong> <font color="#2040a0">length</font> <font color="4444FF">=</font> <font color="#2040a0">data</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">size2</font><font color="4444FF">;</font>
+  <font color="#2040a0">SNDFILE</font>	<font color="4444FF">*</font><font color="#2040a0">infile</font><font color="4444FF">[</font><font color="#2040a0">noOfSoundFiles</font><font color="4444FF">]</font><font color="4444FF">;</font>
+  <font color="#2040a0">SF_INFO</font>	<font color="#2040a0">sfinfo</font><font color="4444FF">;</font>
+  <strong>int</strong> <font color="#2040a0">count</font><font color="4444FF">;</font>
+  <strong>char</strong> <font color="#2040a0">soundFilesNames</font><font color="4444FF">[</font><font color="#2040a0">noOfSoundFiles</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#FF0000">40</font><font color="4444FF">]</font><font color="4444FF">;</font>
+  <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#2040a0">noOfSoundFiles</font><font color="4444FF">]</font><font color="4444FF">;</font>
+
+
+  <font color="#444444">/* Create Mixture Names */</font>
+  <strong>for</strong><font color="4444FF">(</font><font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">count</font> <font color="4444FF">&lt;</font> <font color="#2040a0">noOfSoundFiles</font><font color="4444FF">;</font> <font color="#2040a0">count</font><font color="4444FF">+</font><font color="4444FF">+</font><font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font>
+      <font color="#2040a0">snprintf</font><font color="4444FF">(</font><font color="#2040a0">soundFilesNames</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font>, <font color="#FF0000">40</font>, <font color="#008000">&quot;%s%d.%s&quot;</font>, <font color="#2040a0">fileName</font>,<font color="#2040a0">count</font><font color="4444FF">+</font><font color="#FF0000">1</font>,<font color="#2040a0">fileExtension</font><font color="4444FF">)</font><font color="4444FF">;</font>
+      <font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">soundFilesNames</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+  <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">!</font> <font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">sf_open</font><font color="4444FF">(</font><font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>, <font color="#2040a0">SFM_READ</font>, <font color="4444FF">&amp;</font><font color="#2040a0">sfinfo</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font>
+	 <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;Error (loadSoundFilesIntoMatrixRows): could not open file : %s<font color="#77dd77">\n</font>&quot;</font>, <font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;error number = %d<font color="#77dd77">\n</font>&quot;</font>,<font color="#2040a0">sf_perror</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#2040a0">gsl_vector</font> <font color="4444FF">*</font> <font color="#2040a0">tempVector</font> <font color="4444FF">=</font> <font color="#2040a0">gsl_vector_alloc</font><font color="4444FF">(</font><font color="#2040a0">sfinfo</font>.<font color="#2040a0">frames</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+  <font color="#2040a0">sf_read_double</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font>, <font color="#2040a0">tempVector</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">data</font>, <font color="#2040a0">sfinfo</font>.<font color="#2040a0">frames</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">gsl_matrix_set_row</font><font color="4444FF">(</font><font color="#2040a0">data</font>,<font color="#FF0000">0</font>,<font color="#2040a0">tempVector</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+  <strong>for</strong><font color="4444FF">(</font><font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">1</font><font color="4444FF">;</font> <font color="#2040a0">count</font> <font color="4444FF">&lt;</font> <font color="#2040a0">noOfSoundFiles</font><font color="4444FF">;</font> <font color="#2040a0">count</font><font color="4444FF">+</font><font color="4444FF">+</font><font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font>
+
+       <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">!</font> <font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">sf_open</font><font color="4444FF">(</font><font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font>, <font color="#2040a0">SFM_READ</font>, <font color="4444FF">&amp;</font><font color="#2040a0">sfinfo</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+       <font color="4444FF"><strong>{</strong></font>
+	   <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;Error (loadSoundFilesIntoMatrixRows): could not open file : %s<font color="#77dd77">\n</font>&quot;</font>, <font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	   <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;error number = %d<font color="#77dd77">\n</font>&quot;</font>,<font color="#2040a0">sf_perror</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	   <font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">;</font>
+       <font color="4444FF"><strong>}</strong></font>
+
+       <font color="#2040a0">sf_read_double</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font>, <font color="#2040a0">tempVector</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">data</font>, <font color="#2040a0">sfinfo</font>.<font color="#2040a0">frames</font><font color="4444FF">)</font><font color="4444FF">;</font>
+       <font color="#2040a0">gsl_matrix_set_row</font><font color="4444FF">(</font><font color="#2040a0">data</font>,<font color="#2040a0">count</font>,<font color="#2040a0">tempVector</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+    <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#444444">/* Free up allocated memory */</font>
+  <strong>for</strong><font color="4444FF">(</font><font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">count</font> <font color="4444FF">&lt;</font> <font color="#2040a0">noOfSoundFiles</font><font color="4444FF">;</font> <font color="#2040a0">count</font><font color="4444FF">+</font><font color="4444FF">+</font><font color="4444FF">)</font>
+   <font color="4444FF"><strong>{</strong></font>
+     <font color="#2040a0">sf_close</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+   <font color="4444FF"><strong>}</strong></font>
+  <font color="#2040a0">gsl_vector_free</font><font color="4444FF">(</font><font color="#2040a0">tempVector</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+<font color="4444FF"><strong>}</strong></font>
+
+
+<font color="#444444">/* Take data from source estimates matrix and save source estimate sound files */</font>
+<strong>void</strong> <font color="#2040a0">saveMatrixRowsAsSoundFiles</font><font color="4444FF">(</font><font color="#2040a0">gsl_matrix</font> <font color="4444FF">*</font> <font color="#2040a0">data</font>, <font color="#2040a0">SF_INFO</font>	<font color="#2040a0">sfinfo</font>,
+				<strong>char</strong> <font color="#2040a0">fileName</font><font color="4444FF">[</font><font color="4444FF">]</font>, <strong>char</strong> <font color="#2040a0">fileExtension</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+
+  <strong>int</strong> <font color="#2040a0">noOfSoundFiles</font> <font color="4444FF">=</font> <font color="#2040a0">data</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">size1</font><font color="4444FF">;</font>
+  <font color="#2040a0">SNDFILE</font> <font color="4444FF">*</font><font color="#2040a0">outfile</font><font color="4444FF">[</font><font color="#2040a0">noOfSoundFiles</font><font color="4444FF">]</font><font color="4444FF">;</font>
+  <strong>int</strong> <font color="#2040a0">count</font>, <font color="#2040a0">length</font><font color="4444FF">;</font>
+  <font color="#2040a0">length</font> <font color="4444FF">=</font> <font color="#2040a0">sfinfo</font>.<font color="#2040a0">frames</font><font color="4444FF">;</font>
+  <font color="#2040a0">gsl_vector</font> <font color="4444FF">*</font> <font color="#2040a0">tempVector</font> <font color="4444FF">=</font> <font color="#2040a0">gsl_vector_alloc</font><font color="4444FF">(</font><font color="#2040a0">length</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <strong>double</strong> <font color="#2040a0">scale</font>, <font color="#2040a0">minVal</font>, <font color="#2040a0">maxVal</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* File names */</font>
+  <strong>char</strong> <font color="#2040a0">soundFilesNames</font><font color="4444FF">[</font><font color="#2040a0">noOfSoundFiles</font><font color="4444FF">]</font><font color="4444FF">[</font><font color="#FF0000">40</font><font color="4444FF">]</font><font color="4444FF">;</font>
+  <strong>char</strong> <font color="4444FF">*</font><font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#2040a0">noOfSoundFiles</font><font color="4444FF">]</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* Create Source Names */</font>
+  <strong>for</strong><font color="4444FF">(</font><font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">count</font> <font color="4444FF">&lt;</font> <font color="#2040a0">noOfSoundFiles</font><font color="4444FF">;</font> <font color="#2040a0">count</font><font color="4444FF">+</font><font color="4444FF">+</font><font color="4444FF">)</font>
+  <font color="4444FF"><strong>{</strong></font>
+     <font color="#2040a0">snprintf</font><font color="4444FF">(</font><font color="#2040a0">soundFilesNames</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font>, <font color="#FF0000">40</font>, <font color="#008000">&quot;%s%d.%s&quot;</font>,<font color="#2040a0">fileName</font>,<font color="#2040a0">count</font><font color="4444FF">+</font><font color="#FF0000">1</font>,<font color="#2040a0">fileExtension</font><font color="4444FF">)</font><font color="4444FF">;</font>
+     <font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">soundFilesNames</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+
+  <strong>for</strong><font color="4444FF">(</font><font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">count</font> <font color="4444FF">&lt;</font> <font color="#2040a0">noOfSoundFiles</font><font color="4444FF">;</font> <font color="#2040a0">count</font><font color="4444FF">+</font><font color="4444FF">+</font><font color="4444FF">)</font>
+  <font color="4444FF"><strong>{</strong></font>
+
+    <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">!</font><font color="4444FF">(</font><font color="#2040a0">outfile</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font> <font color="4444FF">=</font> <font color="#2040a0">sf_open</font><font color="4444FF">(</font><font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font>, <font color="#2040a0">SFM_WRITE</font>, <font color="4444FF">&amp;</font><font color="#2040a0">sfinfo</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+      <font color="4444FF"><strong>{</strong></font>
+	<font color="#2040a0">printf</font> <font color="4444FF">(</font><font color="#008000">&quot;Error (saveMatrixRowsAsSoundFiles): could not write file : %s<font color="#77dd77">\n</font>&quot;</font>, <font color="#2040a0">soundFilesNamesPointers</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	<font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">;</font>
+      <font color="4444FF"><strong>}</strong></font>
+  <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#444444">/* Fix dynamic range of sources to -1.0 -&gt; 1.0 */</font>
+  <font color="#2040a0">gsl_matrix_minmax</font><font color="4444FF">(</font><font color="#2040a0">data</font>,<font color="4444FF">&amp;</font><font color="#2040a0">minVal</font>,<font color="4444FF">&amp;</font><font color="#2040a0">maxVal</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="#2040a0">minVal</font> <font color="4444FF">=</font> <font color="#2040a0">GSL_SIGN</font><font color="4444FF">(</font><font color="#2040a0">minVal</font><font color="4444FF">)</font><font color="4444FF">*</font><font color="#2040a0">minVal</font><font color="4444FF">;</font> <font color="#444444">/* Make +ve */</font>
+  <font color="#2040a0">maxVal</font> <font color="4444FF">=</font> <font color="#2040a0">GSL_SIGN</font><font color="4444FF">(</font><font color="#2040a0">maxVal</font><font color="4444FF">)</font><font color="4444FF">*</font><font color="#2040a0">maxVal</font><font color="4444FF">;</font> <font color="#444444">/* Make +ve */</font>
+  <strong>if</strong><font color="4444FF">(</font><font color="#2040a0">minVal</font> <font color="4444FF">&gt;</font><font color="4444FF">=</font> <font color="#2040a0">maxVal</font><font color="4444FF">)</font> <font color="#444444">/* Compare */</font>
+  <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">scale</font> <font color="4444FF">=</font> <font color="#FF0000">1.0</font>/<font color="#2040a0">minVal</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <strong>else</strong>
+  <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">scale</font> <font color="4444FF">=</font> <font color="#FF0000">1.0</font>/<font color="#2040a0">maxVal</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+  <font color="#2040a0">gsl_matrix_scale</font><font color="4444FF">(</font><font color="#2040a0">data</font>,<font color="#2040a0">scale</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+
+  <strong>for</strong> <font color="4444FF">(</font><font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">count</font> <font color="4444FF">&lt;</font> <font color="#2040a0">noOfSoundFiles</font><font color="4444FF">;</font> <font color="#2040a0">count</font><font color="4444FF">+</font><font color="4444FF">+</font><font color="4444FF">)</font>
+  <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">gsl_matrix_get_row</font><font color="4444FF">(</font><font color="#2040a0">tempVector</font>,<font color="#2040a0">data</font>,<font color="#2040a0">count</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="#2040a0">sf_write_double</font><font color="4444FF">(</font><font color="#2040a0">outfile</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font>, <font color="#2040a0">tempVector</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">data</font>, <font color="#2040a0">length</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+
+  <strong>for</strong><font color="4444FF">(</font><font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">count</font> <font color="4444FF">&lt;</font> <font color="#2040a0">noOfSoundFiles</font><font color="4444FF">;</font> <font color="#2040a0">count</font><font color="4444FF">+</font><font color="4444FF">+</font><font color="4444FF">)</font>
+  <font color="4444FF"><strong>{</strong></font>
+    <font color="#2040a0">sf_close</font><font color="4444FF">(</font><font color="#2040a0">outfile</font><font color="4444FF">[</font><font color="#2040a0">count</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+  <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#444444">/* Free up allocated memory */</font>
+  <font color="#2040a0">gsl_vector_free</font><font color="4444FF">(</font><font color="#2040a0">tempVector</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+<font color="4444FF"><strong>}</strong></font>
+
+<font color="#444444">/* Open sound file and place data into a vector */</font>
+<strong>void</strong> <font color="#2040a0">loadSoundFileIntoVector</font><font color="4444FF">(</font><font color="#2040a0">gsl_vector</font> <font color="4444FF">*</font> <font color="#2040a0">data</font>, <strong>char</strong> <font color="#2040a0">fileName</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <strong>int</strong> <font color="#2040a0">length</font> <font color="4444FF">=</font> <font color="#2040a0">data</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">size</font><font color="4444FF">;</font>
+  <font color="#2040a0">SNDFILE</font>	<font color="4444FF">*</font><font color="#2040a0">infile</font><font color="4444FF">;</font>
+  <font color="#2040a0">SF_INFO</font>	<font color="#2040a0">sfinfo</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* Open sound file */</font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">!</font><font color="4444FF">(</font><font color="#2040a0">infile</font> <font color="4444FF">=</font> <font color="#2040a0">sf_open</font><font color="4444FF">(</font><font color="#2040a0">fileName</font>, <font color="#2040a0">SFM_READ</font>, <font color="4444FF">&amp;</font><font color="#2040a0">sfinfo</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font>
+	 <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;Error (loadSoundFileIntoVector): could not open file : %s<font color="#77dd77">\n</font>&quot;</font>, <font color="#2040a0">fileName</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;error number = %d<font color="#77dd77">\n</font>&quot;</font>,<font color="#2040a0">sf_perror</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#444444">/* Place data into vector */</font>
+  <font color="#2040a0">sf_read_double</font><font color="4444FF">(</font><font color="#2040a0">infile</font>, <font color="#2040a0">data</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">data</font>, <font color="#2040a0">sfinfo</font>.<font color="#2040a0">frames</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* Free up allocated memory */</font>
+  <font color="#2040a0">sf_close</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+<font color="4444FF"><strong>}</strong></font>
+
+<font color="#444444">/* Save vector data to a sound file */</font>
+<strong>void</strong> <font color="#2040a0">saveVectorAsSoundFile</font><font color="4444FF">(</font><font color="#2040a0">gsl_vector</font> <font color="4444FF">*</font> <font color="#2040a0">data</font>, <font color="#2040a0">SF_INFO</font>	<font color="#2040a0">sfinfo</font>,<strong>char</strong> <font color="#2040a0">fileName</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <strong>int</strong> <font color="#2040a0">length</font> <font color="4444FF">=</font> <font color="#2040a0">data</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">size</font><font color="4444FF">;</font>
+  <font color="#2040a0">SNDFILE</font>	<font color="4444FF">*</font><font color="#2040a0">outfile</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* Open sound file */</font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">!</font><font color="4444FF">(</font><font color="#2040a0">outfile</font> <font color="4444FF">=</font> <font color="#2040a0">sf_open</font><font color="4444FF">(</font><font color="#2040a0">fileName</font>, <font color="#2040a0">SFM_WRITE</font>, <font color="4444FF">&amp;</font><font color="#2040a0">sfinfo</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font>
+	 <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;Error (saveVectorAsSoundFile): could not write file : %s<font color="#77dd77">\n</font>&quot;</font>, <font color="#2040a0">fileName</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;error number = %d<font color="#77dd77">\n</font>&quot;</font>,<font color="#2040a0">sf_perror</font><font color="4444FF">(</font><font color="#2040a0">outfile</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#444444">/* Place data into vector */</font>
+  <font color="#2040a0">sf_write_double</font><font color="4444FF">(</font><font color="#2040a0">outfile</font>, <font color="#2040a0">data</font><font color="4444FF">-</font><font color="4444FF">&gt;</font><font color="#2040a0">data</font>, <font color="#2040a0">length</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* Free up allocated memory */</font>
+  <font color="#2040a0">sf_close</font><font color="4444FF">(</font><font color="#2040a0">outfile</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+<font color="4444FF"><strong>}</strong></font>
+
+<font color="#444444">/* Open stereo file and place channels in rows of a matrix */</font>
+<strong>void</strong> <font color="#2040a0">loadStereoFileIntoMatrix</font><font color="4444FF">(</font><font color="#2040a0">gsl_matrix</font> <font color="4444FF">*</font> <font color="#2040a0">data</font>, <strong>char</strong> <font color="#2040a0">fileName</font><font color="4444FF">[</font><font color="4444FF">]</font><font color="4444FF">)</font>
+<font color="4444FF"><strong>{</strong></font>
+  <strong>int</strong>		<font color="#2040a0">count</font><font color="4444FF">;</font>
+  <font color="#2040a0">SNDFILE</font>	<font color="4444FF">*</font><font color="#2040a0">infile</font><font color="4444FF">;</font>
+  <font color="#2040a0">SF_INFO</font>	<font color="#2040a0">sfinfo</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* Open sound file */</font>
+  <strong>if</strong> <font color="4444FF">(</font><font color="4444FF">!</font><font color="4444FF">(</font><font color="#2040a0">infile</font> <font color="4444FF">=</font> <font color="#2040a0">sf_open</font><font color="4444FF">(</font><font color="#2040a0">fileName</font>, <font color="#2040a0">SFM_READ</font>, <font color="4444FF">&amp;</font><font color="#2040a0">sfinfo</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font>
+	 <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;Error (loadStereoFileIntoMatrix): could not open file : %s<font color="#77dd77">\n</font>&quot;</font>, <font color="#2040a0">fileName</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="#2040a0">printf</font><font color="4444FF">(</font><font color="#008000">&quot;error number = %d<font color="#77dd77">\n</font>&quot;</font>,<font color="#2040a0">sf_perror</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">)</font><font color="4444FF">)</font><font color="4444FF">;</font>
+	 <font color="#2040a0">exit</font><font color="4444FF">(</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#444444">/* A frame contains samples for all channels at time t */</font>
+  <strong>double</strong>	<font color="#2040a0">frameData</font><font color="4444FF">[</font><font color="#2040a0">sfinfo</font>.<font color="#2040a0">channels</font><font color="4444FF">]</font><font color="4444FF">;</font>
+
+  <font color="#444444">/* de-interleave data and place into 2 row matrix */</font>
+  <strong>for</strong><font color="4444FF">(</font><font color="#2040a0">count</font> <font color="4444FF">=</font> <font color="#FF0000">0</font><font color="4444FF">;</font> <font color="#2040a0">count</font> <font color="4444FF">&lt;</font> <font color="#2040a0">sfinfo</font>.<font color="#2040a0">frames</font><font color="4444FF">;</font> <font color="#2040a0">count</font><font color="4444FF">+</font><font color="4444FF">+</font><font color="4444FF">)</font>
+    <font color="4444FF"><strong>{</strong></font>
+      <font color="#444444">/* read interleaved frames one-by-one and de-interleave */</font>
+      <font color="#2040a0">sf_readf_double</font><font color="4444FF">(</font><font color="#2040a0">infile</font>,<font color="#2040a0">frameData</font>,<font color="4444FF">(</font><font color="#2040a0">sf_count_t</font><font color="4444FF">)</font><font color="#FF0000">1</font><font color="4444FF">)</font><font color="4444FF">;</font>
+      <font color="#2040a0">gsl_matrix_set</font><font color="4444FF">(</font><font color="#2040a0">data</font>,<font color="#FF0000">0</font>,<font color="#2040a0">count</font>,<font color="#2040a0">frameData</font><font color="4444FF">[</font><font color="#FF0000">0</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+      <font color="#2040a0">gsl_matrix_set</font><font color="4444FF">(</font><font color="#2040a0">data</font>,<font color="#FF0000">1</font>,<font color="#2040a0">count</font>,<font color="#2040a0">frameData</font><font color="4444FF">[</font><font color="#FF0000">1</font><font color="4444FF">]</font><font color="4444FF">)</font><font color="4444FF">;</font>
+    <font color="4444FF"><strong>}</strong></font>
+
+  <font color="#444444">/* Free up allocated memory */</font>
+  <font color="#2040a0">sf_close</font><font color="4444FF">(</font><font color="#2040a0">infile</font><font color="4444FF">)</font><font color="4444FF">;</font>
+
+<font color="4444FF"><strong>}</strong></font>
+
+</pre>
+<hr>
+syntax highlighted by <a href="http://www.palfrader.org/code2html">Code2HTML</a>, v. 0.9.1
+</body>
+</html>
