@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <bitset>
 #include <map>
+#include <math.h>
 
 #ifdef _WIN32
 
@@ -38,20 +39,14 @@ static inline double round(double val)
 }
 
 #else
+
 unsigned int bit_count(unsigned int x)
 {
-  x = (((x >> 1) & 0b01010101010101010101010101010101)
-       + x       & 0b01010101010101010101010101010101);
-  x = (((x >> 2) & 0b00110011001100110011001100110011)
-       + x       & 0b00110011001100110011001100110011); 
-  x = (((x >> 4) & 0b00001111000011110000111100001111)
-       + x       & 0b00001111000011110000111100001111); 
-  x = (((x >> 8) & 0b00000000111111110000000011111111)
-       + x       & 0b00000000111111110000000011111111); 
-  x = (((x >> 16)& 0b00000000000000001111111111111111)
-       + x       & 0b00000000000000001111111111111111); 
-  return x;
+    //return std::bitset<32>(x).count();
+	return __builtin_popcount(x);
+    //return __popcnt(x);
 }
+
 #endif
 
 typedef std::vector<uint32_t> key_vector;
@@ -142,7 +137,7 @@ size_t match_single_pass(const key_vector& record_keys, const key_vector& sample
 int main(int argc, char* argv[])
 {
     if(argc < 3) {
-        printf("Usage: amatch <track filename> <sample filename> [num of tests]");
+        printf("Usage: amatch <track filename> <sample filename> [num of tests]\n\n");
         return 1;
     }
     int nsec = 10;

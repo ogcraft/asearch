@@ -1,10 +1,5 @@
 /* -*-  Mode:C++; c-basic-offset:8; tab-width:8; indent-tabs-mode:t -*- */
 
-/*
-Author: Yan Ke
-August 2004
-*/
-
 #include <assert.h>
 #include <stdarg.h>
 #include <iostream>
@@ -13,6 +8,7 @@ August 2004
 
 #include "filters.h"
 #include "utils.h"
+#include <math.h>
 
 Filter::Filter(unsigned int id, float threshold, float weight) {
 	this->id = id;

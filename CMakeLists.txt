@@ -3,7 +3,7 @@ project (amatch)
 
 message( STATUS "${PROJECT_SOURCE_DIR}: " ${PROJECT_SOURCE_DIR} )
 
-include_directories ( ${PROJECT_SOURCE_DIR}/include )
+#include_directories ( ${PROJECT_SOURCE_DIR}/include ) # win32
 link_directories    ( ${PROJECT_SOURCE_DIR}/lib )
 
 add_executable (generate_pfkeys 
@@ -18,12 +18,12 @@ add_executable (amatch
 	)
 
 target_link_libraries ( generate_pfkeys
- 	#fftw3
-    libfftw3-3
-	libsndfile-1.lib 
+ 	fftw3
+	sndfile 
+	#libfftw3-3 # win32
+	#libsndfile-1.lib # win32 
 	#samplerate 
 	#armadillo 
-	#sndfile 
 	#boost_iostreams 
 	#boost_system 
     )   
