@@ -8,13 +8,15 @@
 #include <map>
 
 #ifdef _WIN32
+
+#include <intrin.h>
 const uint32_t  b1 = 0x55555555; // 0b01010101010101010101010101010101
 const uint32_t  b2 = 0x33333333; //0b00110011001100110011001100110011
 const uint32_t  b3 = 0x0f0f0f0f; //0b00001111000011110000111100001111
 const uint32_t  b4 = 0x00ff00ff; //0b00000000111111110000000011111111
 const uint32_t  b5 = 0x0000ffff; //0b00000000000000001111111111111111
 
-unsigned int bit_count(unsigned int x)
+unsigned int bit_count1(unsigned int x)
 {
   x = (((x >> 1) & b1) + x & b1);
   x = (((x >> 2) & b2) + x & b2); 
@@ -24,9 +26,10 @@ unsigned int bit_count(unsigned int x)
   return x;
 }
 
-unsigned int bit_count1(unsigned int x)
+unsigned int bit_count(unsigned int x)
 {
-    return std::bitset<32>(x).count();
+    //return std::bitset<32>(x).count();
+    return __popcnt(x);
 }
 
 static inline double round(double val)
@@ -142,7 +145,7 @@ int main(int argc, char* argv[])
         printf("Usage: amatch <track filename> <sample filename> [num of tests]");
         return 1;
     }
-    int nsec = 3;
+    int nsec = 10;
     int max_tryes = 2000;
     int start_sample = 100; // 5 * keys_in_sec;
     if(argc >= 4) {
