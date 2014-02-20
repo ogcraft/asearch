@@ -1,10 +1,9 @@
 recordkfn = "../../../asearchdata/makarevich-litsa-recorded-fingerpoints.bin"
 fullsamplekfn = "../../../asearchdata/makarevich-litsa-recorded-fingerpoints.bin"
 
-#recordkfn = "/Users/olegg/asearchdata/mercury_rising/VTS_01_4-fingerpoints.bin"
-#fullsamplekfn = "/Users/olegg/asearchdata/mercury_rising/VTS_01_4-rec-5513-fingerpoints.bin"
+recordkfn = "/Users/olegg/asearchdata/mercury_rising/VTS_01_4-fingerpoints.bin"
+fullsamplekfn = "/Users/olegg/asearchdata/mercury_rising/VTS_01_4-rec-5513-fingerpoints.bin"
 
-#recordkfn = "../../../asearchdata/prometheus-02-eng-dvd-fingerpoints.bin"
 
 keys_in_sec = 86
 sec_per_sample =  0.01164 
@@ -60,10 +59,14 @@ function match_single_pass(record_keys, sample_keys, nsec, sec)
     nrecords = length(record_keys)
     nsamples = length(sample_keys)
     diffs = fill(33, nrecords)
-    for i = 1:(nrecords-(nsec+1) * keys_in_sec)
+    max_i = (nrecords-(nsec+1) * keys_in_sec)
+    @printf "nrecords: %d nsamples:%d max_i: %d\n" nrecords nsamples max_i
+    k = 1
+    for i = 1:max_i
 	    diffs[i] = calc_dist(i, record_keys, sample_keys, nsec, 0)
+        k += 1
     end
-    @printf "Collected %d diffs\n"  length(diffs)
+    @printf "Collected %d diffs k: %d\n"  length(diffs) k
     m,index=findmin(diffs)
     @printf "Found sec: %f min: %d index: %d \n" index*sec_per_sample m index
     diff_in_secs = (sec - index * sec_per_sample)

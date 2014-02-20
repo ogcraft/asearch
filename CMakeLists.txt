@@ -1,12 +1,12 @@
 cmake_minimum_required (VERSION 2.6) 
-project (asearch)
+project (amatch)
 
 message( STATUS "${PROJECT_SOURCE_DIR}: " ${PROJECT_SOURCE_DIR} )
 
 include_directories ( ${PROJECT_SOURCE_DIR}/include )
 link_directories    ( ${PROJECT_SOURCE_DIR}/lib )
 
-add_executable (asearch 
+add_executable (generate_pfkeys 
 	asearch.cpp 
 	utils.cpp
 	sigproc.cpp
@@ -17,8 +17,8 @@ add_executable (amatch
 	amatch.cpp 
 	)
 
-target_link_libraries (asearch 
-	#fftw3
+target_link_libraries ( generate_pfkeys
+ 	#fftw3
     libfftw3-3
 	libsndfile-1.lib 
 	#samplerate 
